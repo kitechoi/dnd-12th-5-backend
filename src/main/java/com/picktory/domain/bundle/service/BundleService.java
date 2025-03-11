@@ -54,6 +54,7 @@ public class BundleService {
     /**
      * 보따리 생성
      */
+    @Transactional
     public BundleResponse createBundle(BundleRequest request) {
         User currentUser = authenticationService.getAuthenticatedUser();
 
