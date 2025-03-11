@@ -83,10 +83,11 @@ public class BundleService {
                 .toList();
 
 //        List<Gift> savedGifts = giftRepository.saveAll(gifts); // Gift 먼저 저장
-        giftRepository.bulkInsertGifts(gifts);
+        List<Gift> savedGifts = giftRepository.bulkInsertGifts(gifts);
+
 
         // 3. 저장된 선물 다시 조회
-        List<Gift> savedGifts = giftRepository.findByBundleId(bundle.getId());
+//        List<Gift> savedGifts = giftRepository.findByBundleId(bundle.getId());
 
         if (savedGifts.isEmpty()) {
             throw new BaseException(BaseResponseStatus.GIFT_LIST_EMPTY);
