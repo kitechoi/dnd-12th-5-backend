@@ -38,6 +38,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.StopWatch;
 
 
 @Slf4j
@@ -56,6 +57,9 @@ public class BundleService {
      */
     @Transactional
     public BundleResponse createBundle(BundleRequest request) {
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();  // 실행 시작
+
         User currentUser = authenticationService.getAuthenticatedUser();
 
         // 프론트 테스트 위해 하루 보따리 생성 개수 테스트 비활성화
@@ -77,13 +81,26 @@ public class BundleService {
         List<Gift> gifts = request.getGifts().stream()
                 .map(giftRequest -> Gift.createGift(bundle.getId(), giftRequest))
                 .toList();
-        List<Gift> savedGifts = giftRepository.saveAll(gifts); // Gift 먼저 저장
 
-        // 3. 선물 이미지 저장 (Gift ID가 존재하는 상태에서 저장)
+//        List<Gift> savedGifts = giftRepository.saveAll(gifts); // Gift 먼저 저장
+        giftRepository.bulkInsertGifts(gifts);
+
+        // 3. 저장된 선물 다시 조회
+        List<Gift> savedGifts = giftRepository.findByBundleId(bundle.getId());
+
+        if (savedGifts.isEmpty()) {
+            throw new BaseException(BaseResponseStatus.GIFT_LIST_EMPTY);
+        }
+
+        // 4. 선물 이미지 저장 (Gift ID가 존재하는 상태에서 저장)
         List<GiftImage> newImages = setPrimaryImage(request.getGifts(), savedGifts);
         giftImageRepository.saveAll(newImages);
 
+        stopWatch.stop();  // 실행 종료
+        log.info("보따리 생성 배치 INSERT 적용 후 실행 시간: {} ms", stopWatch.getTotalTimeMillis());
+
         return BundleResponse.fromEntity(bundle, savedGifts, newImages);
+//        return BundleResponse.fromEntity(bundle, savedGifts, null);
     }
 
     /**

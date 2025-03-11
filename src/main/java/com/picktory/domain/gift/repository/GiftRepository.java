@@ -9,7 +9,7 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 import java.util.Optional;
 
-public interface GiftRepository extends JpaRepository<Gift, Long> {
+public interface GiftRepository extends JpaRepository<Gift, Long>, GiftRepositoryCustom {
     List<Gift> findByBundleId(Long bundleId);
 
     @Modifying
