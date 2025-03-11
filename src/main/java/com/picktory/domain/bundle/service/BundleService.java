@@ -86,22 +86,20 @@ public class BundleService {
         List<Gift> savedGifts = giftRepository.bulkInsertGifts(gifts);
 
 
-        // 3. 저장된 선물 다시 조회
-//        List<Gift> savedGifts = giftRepository.findByBundleId(bundle.getId());
-
         if (savedGifts.isEmpty()) {
             throw new BaseException(BaseResponseStatus.GIFT_LIST_EMPTY);
         }
 
         // 4. 선물 이미지 저장 (Gift ID가 존재하는 상태에서 저장)
         List<GiftImage> newImages = setPrimaryImage(request.getGifts(), savedGifts);
-        giftImageRepository.saveAll(newImages);
+//        giftImageRepository.saveAll(newImages);
 
+        List<GiftImage> savedGiftImages = giftImageRepository.bulkInsertGiftImages(newImages);
         stopWatch.stop();  // 실행 종료
         log.info("보따리 생성 배치 INSERT 적용 후 실행 시간: {} ms", stopWatch.getTotalTimeMillis());
 
-        return BundleResponse.fromEntity(bundle, savedGifts, newImages);
-//        return BundleResponse.fromEntity(bundle, savedGifts, null);
+        return BundleResponse.fromEntity(bundle, savedGifts, savedGiftImages);
+//        return BundleResponse.fromEntity(bundle, savedGifts, newImages);
     }
 
     /**

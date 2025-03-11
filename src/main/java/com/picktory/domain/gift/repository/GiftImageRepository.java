@@ -9,7 +9,7 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 import java.util.Optional;
 
-public interface GiftImageRepository extends JpaRepository<GiftImage, Long> {
+public interface GiftImageRepository extends JpaRepository<GiftImage, Long>, GiftImageRepositoryCustom {
 //    List<GiftImage> findByGiftId(Long giftId);
     @Query("SELECT gi FROM GiftImage gi WHERE gi.gift.id = :giftId")
     List<GiftImage> findByGiftId(@Param("giftId") Long giftId);
