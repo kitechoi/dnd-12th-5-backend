@@ -28,7 +28,6 @@ public class GiftRepositoryImpl implements GiftRepositoryCustom {
         String sql = "INSERT INTO gifts (bundle_id, name, message, purchase_url, created_at, is_responsed) " +
                 "VALUES (?, ?, ?, ?, NOW(), ?)";
 
-        // KeyHolder를 이용해 INSERT된 ID 리스트 가져오기
         List<Long> generatedIds = jdbcBatchExecutor.executeBatchAndGetKeys(sql, new BatchPreparedStatementSetter() {
             @Override
             public void setValues(PreparedStatement ps, int i) throws SQLException {
@@ -46,7 +45,6 @@ public class GiftRepositoryImpl implements GiftRepositoryCustom {
             }
         });
 
-        // ID가 포함된 `Gift` 객체 리스트 생성하여 반환 (빌더 사용)
         List<Gift> savedGifts = new ArrayList<>();
         for (int i = 0; i < gifts.size(); i++) {
             Gift gift = gifts.get(i);

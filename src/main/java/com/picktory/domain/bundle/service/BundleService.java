@@ -57,8 +57,9 @@ public class BundleService {
      */
     @Transactional
     public BundleResponse createBundle(BundleRequest request) {
+
         StopWatch stopWatch = new StopWatch();
-        stopWatch.start();  // 실행 시작
+        stopWatch.start();
 
         User currentUser = authenticationService.getAuthenticatedUser();
 
@@ -81,8 +82,6 @@ public class BundleService {
         List<Gift> gifts = request.getGifts().stream()
                 .map(giftRequest -> Gift.createGift(bundle.getId(), giftRequest))
                 .toList();
-
-//        List<Gift> savedGifts = giftRepository.saveAll(gifts); // Gift 먼저 저장
         List<Gift> savedGifts = giftRepository.bulkInsertGifts(gifts);
 
 
@@ -90,16 +89,14 @@ public class BundleService {
             throw new BaseException(BaseResponseStatus.GIFT_LIST_EMPTY);
         }
 
-        // 4. 선물 이미지 저장 (Gift ID가 존재하는 상태에서 저장)
+        // 3. 선물 이미지 저장
         List<GiftImage> newImages = setPrimaryImage(request.getGifts(), savedGifts);
-//        giftImageRepository.saveAll(newImages);
-
         List<GiftImage> savedGiftImages = giftImageRepository.bulkInsertGiftImages(newImages);
-        stopWatch.stop();  // 실행 종료
+
+        stopWatch.stop();
         log.info("보따리 생성 배치 INSERT 적용 후 실행 시간: {} ms", stopWatch.getTotalTimeMillis());
 
         return BundleResponse.fromEntity(bundle, savedGifts, savedGiftImages);
-//        return BundleResponse.fromEntity(bundle, savedGifts, newImages);
     }
 
     /**
