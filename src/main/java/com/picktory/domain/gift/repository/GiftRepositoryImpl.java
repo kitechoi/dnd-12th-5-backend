@@ -14,7 +14,6 @@ import java.util.List;
 
 @Repository
 @RequiredArgsConstructor
-@Slf4j
 public class GiftRepositoryImpl implements GiftRepositoryCustom {
 
     private final JdbcBatchExecutor jdbcBatchExecutor;
@@ -59,7 +58,6 @@ public class GiftRepositoryImpl implements GiftRepositoryCustom {
                     .build()
             );
         }
-
         return savedGifts;
     }
 }

@@ -82,7 +82,8 @@ public class BundleService {
         List<Gift> gifts = request.getGifts().stream()
                 .map(giftRequest -> Gift.createGift(bundle.getId(), giftRequest))
                 .toList();
-        List<Gift> savedGifts = giftRepository.bulkInsertGifts(gifts);
+//        List<Gift> savedGifts = giftRepository.bulkInsertGifts(gifts);
+        List<Gift> savedGifts = giftRepository.saveAll(gifts); // Gift 먼저 저장
 
 
         if (savedGifts.isEmpty()) {
@@ -91,12 +92,14 @@ public class BundleService {
 
         // 3. 선물 이미지 저장
         List<GiftImage> newImages = setPrimaryImage(request.getGifts(), savedGifts);
-        List<GiftImage> savedGiftImages = giftImageRepository.bulkInsertGiftImages(newImages);
+//        List<GiftImage> savedGiftImages = giftImageRepository.bulkInsertGiftImages(newImages);
+        giftImageRepository.saveAll(newImages);
 
         stopWatch.stop();
         log.info("보따리 생성 배치 INSERT 적용 후 실행 시간: {} ms", stopWatch.getTotalTimeMillis());
 
-        return BundleResponse.fromEntity(bundle, savedGifts, savedGiftImages);
+//        return BundleResponse.fromEntity(bundle, savedGifts, savedGiftImages);
+        return BundleResponse.fromEntity(bundle, savedGifts, newImages);
     }
 
     /**
